@@ -1,6 +1,6 @@
-# Simple URL Shortener with Short.io
+# CFF URL Shortener
 
-This is a simple URL shortener application that uses the short.io API. It includes a basic password protection screen before allowing users to shorten URLs.
+This is a simple URL shortener application for Code for Fun that uses the short.io API. It includes a basic password protection screen before allowing users to shorten URLs. The application features a salmon color theme.
 
 ## Features
 
@@ -9,6 +9,7 @@ This is a simple URL shortener application that uses the short.io API. It includ
 - Optional custom slug support
 - Copy-to-clipboard functionality
 - Responsive design
+- Salmon color theme
 - API key storage (server-side only)
 - Netlify serverless functions (no spin-down time)
 
@@ -48,6 +49,8 @@ This is a simple URL shortener application that uses the short.io API. It includ
 ### One-Click Deploy
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/tinkertanker/short-io-hoster)
+
+Note: After deployment, you'll need to set up the environment variables mentioned above in your Netlify dashboard.
 
 ## Security Notes
 
