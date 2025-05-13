@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Functions
     async function validatePassword() {
         const password = passwordInput.value;
-        
+
         if (!password) {
             passwordError.textContent = 'Please enter a password.';
             return;
@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             passwordSubmit.disabled = true;
             passwordSubmit.textContent = 'Checking...';
-            
-            const response = await fetch('/api/authenticate', {
+
+            const response = await fetch('/.netlify/functions/api/authenticate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -43,8 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-            
+
             if (response.ok) {
+                // Store password temporarily for subsequent requests
+                sessionStorage.setItem('password', password);
+
                 passwordScreen.classList.remove('active');
                 shortenerScreen.classList.add('active');
             } else {
@@ -63,7 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function shortenUrl() {
         const url = urlInput.value;
         const slug = slugInput.value;
-        
+        const password = sessionStorage.getItem('password');
+
         // Basic URL validation
         if (!url) {
             showError('Please enter a URL to shorten.');
@@ -78,18 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide any previous errors and results
         errorMessage.textContent = '';
         resultContainer.classList.add('hidden');
-        
+
         try {
             // Show loading state
             shortenButton.textContent = 'Shortening...';
             shortenButton.disabled = true;
-            
-            const response = await fetch('/api/shorten', {
+
+            const response = await fetch('/.netlify/functions/api/shorten', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    password,
                     url,
                     slug
                 })
@@ -101,16 +106,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            
+
             // Display the result
             shortenedUrl.textContent = data.shortURL;
             resultContainer.classList.remove('hidden');
-            
+
             // Reset inputs
             urlInput.value = '';
             slugInput.value = '';
         } catch (error) {
             showError(`Error: ${error.message}`);
+            // If authentication error, go back to password screen
+            if (error.message.includes('Invalid password') || error.message.includes('Password is required')) {
+                sessionStorage.removeItem('password');
+                passwordScreen.classList.add('active');
+                shortenerScreen.classList.remove('active');
+            }
         } finally {
             // Reset button state
             shortenButton.textContent = 'Shorten URL';

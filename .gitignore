@@ -33,5 +33,15 @@ pids
 Thumbs.db
 **/.claude/settings.local.json
 
+# Netlify
+.netlify
+netlify/functions-serve/
+
+# Build directories
+dist
+build
+
 # Old frontend files - not needed for the new server version
 /env.js
+/server.js
+/render.yaml
