@@ -17,6 +17,7 @@ body {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #FFC0CB; /* Pink, a lighter complement to salmon */
     width: 90%;
     max-width: 500px;
     padding: 2rem;
@@ -25,14 +26,15 @@ body {
 h1 {
     text-align: center;
     margin-bottom: 2rem;
-    color: #333;
+    color: #E9967A; /* Dark Salmon */
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
 }
 
 h2 {
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
     font-size: 1.2rem;
-    color: #333;
+    color: #E9967A; /* Dark Salmon */
 }
 
 .form-group {
@@ -45,10 +47,17 @@ input {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #FA8072; /* Salmon */
+    box-shadow: 0 0 0 2px rgba(250, 128, 114, 0.2); /* Salmon with opacity */
 }
 
 button {
-    background-color: #4285f4;
+    background-color: #FA8072; /* Salmon color */
     color: white;
     border: none;
     border-radius: 4px;
@@ -59,7 +68,7 @@ button {
 }
 
 button:hover {
-    background-color: #3367d6;
+    background-color: #E9967A; /* Dark Salmon color for hover */
 }
 
 .screen {
@@ -96,7 +105,7 @@ button:hover {
 }
 
 .error-message {
-    color: #d93025;
+    color: #FF6347; /* Tomato, which is a bit darker than salmon for readability */
     margin-top: 0.5rem;
     text-align: center;
 }
