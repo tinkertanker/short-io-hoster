@@ -37,12 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Functions
     function validatePassword() {
         const password = passwordInput.value;
-        
+        console.log("Entered password:", password);
+        console.log("Expected password:", config.password);
+
         if (password === config.password) {
             passwordScreen.classList.remove('active');
             shortenerScreen.classList.add('active');
         } else {
-            passwordError.textContent = 'Incorrect password. Please try again.';
+            passwordError.textContent = 'Incorrect password. Please try again. (Debug: Expected "' + config.password + '")';
             passwordInput.value = '';
         }
     }
