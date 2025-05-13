@@ -1,5 +1,5 @@
 window.env = {
   PASSWORD: 'IMDACFF2025!',
-  SHORT_IO_API_KEY: 'sk_placeholder_replace_with_actual_key',
-  SHORT_DOMAIN: 'short.tinkertanker.com'
+  SHORT_IO_API_KEY: 'sk_sgh98QhmvxVWKZYH',
+  SHORT_DOMAIN: 'go.codeforfun.sg'
 };
