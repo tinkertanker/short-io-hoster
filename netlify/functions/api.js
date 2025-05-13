@@ -15,34 +15,46 @@ app.use(express.json());
 
 // Routes
 router.post('/authenticate', (req, res) => {
+  console.log('Authentication request received:', req.body);
+  console.log('Expected password:', SIMPLE_PASSWORD);
+
   const { password } = req.body;
 
   if (!password) {
+    console.log('No password provided in request');
     return res.status(400).json({ error: 'Password is required' });
   }
 
   // Simple password comparison
   if (password !== SIMPLE_PASSWORD) {
+    console.log('Password mismatch. Received:', password);
     return res.status(401).json({ error: 'Invalid password' });
   }
 
+  console.log('Authentication successful');
   res.json({ success: true });
 });
 
 router.post('/shorten', async (req, res) => {
+  console.log('Shorten request received:', req.body);
+  console.log('Expected password:', SIMPLE_PASSWORD);
+
   const { password, url, slug } = req.body;
 
   // Authenticate first
   if (!password) {
+    console.log('No password provided in shorten request');
     return res.status(400).json({ error: 'Password is required' });
   }
 
   if (password !== SIMPLE_PASSWORD) {
+    console.log('Password mismatch in shorten request. Received:', password);
     return res.status(401).json({ error: 'Invalid password' });
   }
 
   // Validate URL
   if (!url) {
+    console.log('No URL provided');
     return res.status(400).json({ error: 'URL is required' });
   }
 
