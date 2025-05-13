@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortenedUrl = document.getElementById('shortened-url');
     const copyButton = document.getElementById('copy-button');
     const errorMessage = document.getElementById('error-message');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
 
     // Event Listeners
     passwordSubmit.addEventListener('click', validatePassword);
@@ -20,6 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     shortenButton.addEventListener('click', shortenUrl);
     copyButton.addEventListener('click', copyToClipboard);
+    darkModeToggle.addEventListener('click', toggleDarkMode);
+
+    // Check for saved theme preference and apply it
+    initializeTheme();
 
     // Functions
     async function validatePassword() {
@@ -155,5 +160,41 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             return false;
         }
+    }
+
+    // Dark mode functions
+    function toggleDarkMode() {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    }
+
+    function initializeTheme() {
+        // Check if user has a preference stored
+        const savedTheme = localStorage.getItem('darkMode');
+
+        // Check if user has a system preference
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // If the user has explicitly chosen a theme, use that
+        if (savedTheme === 'enabled') {
+            document.body.classList.add('dark-mode');
+        } else if (savedTheme === 'disabled') {
+            document.body.classList.remove('dark-mode');
+        } else if (prefersDarkScheme.matches) {
+            // If no saved preference but system prefers dark mode
+            document.body.classList.add('dark-mode');
+        }
+
+        // Also listen for system theme changes
+        prefersDarkScheme.addEventListener('change', (e) => {
+            // Only apply system preference if user hasn't set a preference
+            if (!localStorage.getItem('darkMode')) {
+                if (e.matches) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+        });
     }
 });
