@@ -1,0 +1,23 @@
+{
+  "name": "short-io-hoster",
+  "version": "1.0.0",
+  "description": "This is a simple frontend-only URL shortener that uses the short.io API. It includes a basic password protection screen before allowing access to the URL shortening functionality.",
+  "main": "env.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

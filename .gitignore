@@ -32,3 +32,6 @@ pids
 .DS_Store
 Thumbs.db
 **/.claude/settings.local.json
+
+# Old frontend files - not needed for the new server version
+/env.js
