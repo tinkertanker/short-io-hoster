@@ -1,15 +1,15 @@
-# Secure URL Shortener with Short.io
+# Simple URL Shortener with Short.io
 
-This is a secure URL shortener application that uses the short.io API. It includes a password-protected access screen before allowing users to shorten URLs.
+This is a simple URL shortener application that uses the short.io API. It includes a basic password protection screen before allowing users to shorten URLs.
 
 ## Features
 
-- Secure serverless password validation
+- Basic password protection
 - URL shortening using short.io API
 - Optional custom slug support
 - Copy-to-clipboard functionality
 - Responsive design
-- Secure API key storage (server-side only)
+- API key storage (server-side only)
 - Netlify serverless functions (no spin-down time)
 
 ## Local Development Setup
@@ -21,22 +21,17 @@ This is a secure URL shortener application that uses the short.io API. It includ
    ```
 3. Create a `.env` file with the following variables:
    ```
-   PASSWORD_HASH=your_bcrypt_hashed_password
+   PASSWORD=your_password
    SHORT_IO_API_KEY=your_short_io_api_key
    SHORT_DOMAIN=your_short_domain.example.com
-   ```
-   
-   You can generate a bcrypt hash using:
-   ```javascript
-   const bcrypt = require('bcryptjs');
-   const hash = bcrypt.hashSync('your-password', 12);
-   console.log(hash);
    ```
 
 4. Run the development server:
    ```
    npm run dev
    ```
+
+5. Open your browser to http://localhost:8888
 
 ## Deploying to Netlify
 
@@ -45,7 +40,7 @@ This is a secure URL shortener application that uses the short.io API. It includ
 3. Connect your GitHub repository
 4. Configuration settings will be automatically applied from the netlify.toml file
 5. Add the following environment variables in the Netlify Dashboard:
-   - `PASSWORD_HASH`: Your bcrypt-hashed password
+   - `PASSWORD`: Your desired password
    - `SHORT_IO_API_KEY`: Your short.io API key
    - `SHORT_DOMAIN`: Your short domain (e.g., "short.example.com")
 6. Click "Deploy site"
@@ -54,14 +49,16 @@ This is a secure URL shortener application that uses the short.io API. It includ
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/tinkertanker/short-io-hoster)
 
-## Security Features
+## Security Notes
 
-This implementation uses proper security practices:
+This implementation uses a simple approach:
 
-1. The password is stored as a bcrypt hash, not in plain text
-2. The Short.io API key is stored server-side and never exposed to the client
-3. Server-side validation of all requests
+1. The password is stored as an environment variable
+2. The short.io API key is stored server-side and never exposed to the client
+3. Password validation happens server-side
 4. Leverages Netlify's serverless functions (which don't have spin-down time like Render's free tier)
+
+This is suitable for basic access control, but not for securing highly sensitive information.
 
 ## Usage
 
