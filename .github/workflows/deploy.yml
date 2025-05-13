@@ -14,11 +14,13 @@ jobs:
 
       - name: Generate env.js file 🔧
         run: |
+          echo "Generating env.js with secrets..."
           echo "window.env = {" > env.js
           echo "  PASSWORD: '${{ secrets.PASSWORD }}'," >> env.js
           echo "  SHORT_IO_API_KEY: '${{ secrets.SHORT_IO_API_KEY }}'," >> env.js
           echo "  SHORT_DOMAIN: '${{ secrets.SHORT_DOMAIN }}'" >> env.js
           echo "};" >> env.js
+          echo "env.js file generated successfully"
 
       - name: Deploy to GitHub Pages 🚀
         uses: JamesIves/github-pages-deploy-action@v4
