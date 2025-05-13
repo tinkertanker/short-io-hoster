@@ -8,7 +8,11 @@ const app = express();
 const router = express.Router();
 
 // Simple password - set via environment variable
-const SIMPLE_PASSWORD = process.env.PASSWORD || 'IMDACFF2025!';
+// Check both environment variables for flexibility
+const SIMPLE_PASSWORD = process.env.PASSWORD || process.env.PASSWORD_HASH || 'IMDACFF2025!';
+console.log('Environment variables loaded:');
+console.log('- PASSWORD:', process.env.PASSWORD);
+console.log('- PASSWORD_HASH:', process.env.PASSWORD_HASH);
 
 // Middleware
 app.use(express.json());
