@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: short-io-hoster
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PASSWORD_HASH
+        sync: false
+      - key: SHORT_IO_API_KEY
+        sync: false
+      - key: SHORT_DOMAIN
+        sync: false
+    autoDeploy: true
