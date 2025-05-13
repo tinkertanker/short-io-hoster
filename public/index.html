@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="password-screen" class="screen active">
+            <h1>URL Shortener</h1>
+            <div class="form-group">
+                <input type="password" id="password-input" placeholder="Enter password">
+            </div>
+            <button id="password-submit">Submit</button>
+            <p id="password-error" class="error-message"></p>
+        </div>
+
+        <div id="shortener-screen" class="screen">
+            <h1>URL Shortener</h1>
+            <div class="form-group">
+                <input type="url" id="url-input" placeholder="Enter URL to shorten" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="slug-input" placeholder="Custom slug (optional)">
+            </div>
+            <button id="shorten-button">Shorten URL</button>
+            
+            <div id="result-container" class="hidden">
+                <h2>Your shortened URL:</h2>
+                <div class="result-box">
+                    <p id="shortened-url"></p>
+                    <button id="copy-button">Copy</button>
+                </div>
+            </div>
+            <p id="error-message" class="error-message"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
