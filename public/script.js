@@ -187,12 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get QR code and add full screen
             const qrImage = fullscreenQr.src;
             if (qrImage && qrImage.startsWith('data:image')) {
-                // Extract base64 data from data URL
+                // Extract mime type and base64 data from data URL
+                const mimeType = qrImage.split(',')[0].split(':')[1].split(';')[0];
                 const base64Data = qrImage.split(',')[1];
                 
                 // Add image full screen with some padding
+                // PptxGenJS requires data format: "image/png;base64,ABC123..."
                 slide.addImage({
-                    data: base64Data,
+                    data: `${mimeType};base64,${base64Data}`,
                     x: 0.5, y: 0.5, w: 9, h: 6.75,
                     sizing: { type: 'contain', w: 9, h: 6.75 }
                 });
