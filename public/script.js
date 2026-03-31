@@ -88,12 +88,34 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadImageBtn.textContent = 'Generating...';
             downloadImageBtn.disabled = true;
             
+            // Hide all action buttons before capturing
+            const actionsContainer = document.querySelector('.fullscreen-actions.primary-actions');
+            const downloadActionsContainer = document.querySelector('.fullscreen-actions.download-actions');
+            const instructionText = document.querySelector('.fullscreen-instruction');
+            
+            if (actionsContainer) actionsContainer.style.display = 'none';
+            if (downloadActionsContainer) downloadActionsContainer.style.display = 'none';
+            if (instructionText) instructionText.style.display = 'none';
+            
+            // Also hide the close button
+            closeFullscreenBtn.style.display = 'none';
+            
+            // Wait a moment for the DOM to update
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             const canvas = await html2canvas(downloadContent, {
                 backgroundColor: '#222',
                 scale: 2,
                 useCORS: true,
-                allowTaint: true
+                allowTaint: true,
+                logging: false
             });
+            
+            // Restore the buttons
+            if (actionsContainer) actionsContainer.style.display = '';
+            if (downloadActionsContainer) downloadActionsContainer.style.display = '';
+            if (instructionText) instructionText.style.display = '';
+            closeFullscreenBtn.style.display = '';
             
             const link = document.createElement('a');
             link.download = `qr-code-${Date.now()}.png`;
@@ -112,6 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error generating image:', error);
             alert('Failed to generate image. Please try again.');
+            
+            // Restore the buttons on error too
+            const actionsContainer = document.querySelector('.fullscreen-actions.primary-actions');
+            const downloadActionsContainer = document.querySelector('.fullscreen-actions.download-actions');
+            const instructionText = document.querySelector('.fullscreen-instruction');
+            if (actionsContainer) actionsContainer.style.display = '';
+            if (downloadActionsContainer) downloadActionsContainer.style.display = '';
+            if (instructionText) instructionText.style.display = '';
+            closeFullscreenBtn.style.display = '';
+            
             downloadImageBtn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -133,12 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create a new presentation
             const pptx = new PptxGenJS();
             
-            // Set slide size to 16:9
-            pptx.defineSlideMaster({
-                title: 'QR_CODE_SLIDE',
-                background: { color: '222222' }
-            });
-            
             const slide = pptx.addSlide();
             
             // Add background color
@@ -147,38 +173,73 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add "Link:" label in white
             slide.addText('Link:', {
                 x: 0.5, y: 0.5, w: 9, h: 0.5,
-                fontSize: 24,
+                fontSize: 28,
                 color: 'FFFFFF',
-                bold: false,
                 align: 'center'
             });
             
-            // Add URL in salmon color (remove https://)
-            const displayUrl = fullscreenUrl.textContent.replace(/^https?:\/\//, '');
+            // Add URL in salmon color
+            const displayUrl = fullscreenUrl.textContent;
             slide.addText(displayUrl, {
-                x: 0.5, y: 1, w: 9, h: 1,
-                fontSize: 36,
+                x: 0.5, y: 1.2, w: 9, h: 1,
+                fontSize: 40,
                 color: 'FA8072',
                 bold: true,
                 align: 'center',
                 wrap: true
             });
             
-            // Add QR code image
+            // Get QR code and convert to proper format for PptxGenJS
             const qrImage = fullscreenQr.src;
-            if (qrImage) {
+            if (qrImage && qrImage.startsWith('data:image')) {
+                // Extract base64 data from data URL
+                const base64Data = qrImage.split(',')[1];
+                
                 slide.addImage({
-                    data: qrImage,
-                    x: 3, y: 2.5, w: 4, h: 4
+                    data: base64Data,
+                    x: 2.5, y: 2.8, w: 5, h: 5,
+                    sizing: { type: 'contain', w: 5, h: 5 }
                 });
             }
             
             // Add instruction text
             slide.addText('Scan QR code or visit the URL above', {
-                x: 0.5, y: 6.8, w: 9, h: 0.5,
-                fontSize: 18,
+                x: 0.5, y: 7.5, w: 9, h: 0.5,
+                fontSize: 20,
                 color: '999999',
                 align: 'center'
+            });
+            
+            // Save the presentation
+            pptx.writeFile({ fileName: `qr-code-${Date.now()}.pptx` });
+            
+            downloadPptxBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Download as PPTX
+            `;
+            downloadPptxBtn.disabled = false;
+        } catch (error) {
+            console.error('Error generating PPTX:', error);
+            alert('Failed to generate PowerPoint. Please try again.');
+            downloadPptxBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Download as PPTX
+            `;
+            downloadPptxBtn.disabled = false;
+        }
+    });
             });
             
             // Save the presentation
