@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullscreenQr = document.getElementById('fullscreen-qr');
     const fullscreenCopy = document.getElementById('fullscreen-copy');
     const fullscreenVisit = document.getElementById('fullscreen-visit');
+    const downloadContent = document.getElementById('download-content');
+    const downloadImageBtn = document.getElementById('download-image');
+    const downloadPptxBtn = document.getElementById('download-pptx');
     
     // Tab elements
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -77,6 +80,136 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => {
                 console.error('Failed to copy:', err);
             });
+    });
+    
+    // Download as Image button
+    downloadImageBtn.addEventListener('click', async () => {
+        try {
+            downloadImageBtn.textContent = 'Generating...';
+            downloadImageBtn.disabled = true;
+            
+            const canvas = await html2canvas(downloadContent, {
+                backgroundColor: '#222',
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            });
+            
+            const link = document.createElement('a');
+            link.download = `qr-code-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            downloadImageBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download as Image
+            `;
+            downloadImageBtn.disabled = false;
+        } catch (error) {
+            console.error('Error generating image:', error);
+            alert('Failed to generate image. Please try again.');
+            downloadImageBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download as Image
+            `;
+            downloadImageBtn.disabled = false;
+        }
+    });
+    
+    // Download as PPTX button
+    downloadPptxBtn.addEventListener('click', async () => {
+        try {
+            downloadPptxBtn.textContent = 'Generating...';
+            downloadPptxBtn.disabled = true;
+            
+            // Create a new presentation
+            const pptx = new PptxGenJS();
+            
+            // Set slide size to 16:9
+            pptx.defineSlideMaster({
+                title: 'QR_CODE_SLIDE',
+                background: { color: '222222' }
+            });
+            
+            const slide = pptx.addSlide();
+            
+            // Add background color
+            slide.background = { color: '222222' };
+            
+            // Add "Link:" label in white
+            slide.addText('Link:', {
+                x: 0.5, y: 0.5, w: 9, h: 0.5,
+                fontSize: 24,
+                color: 'FFFFFF',
+                bold: false,
+                align: 'center'
+            });
+            
+            // Add URL in salmon color (remove https://)
+            const displayUrl = fullscreenUrl.textContent.replace(/^https?:\/\//, '');
+            slide.addText(displayUrl, {
+                x: 0.5, y: 1, w: 9, h: 1,
+                fontSize: 36,
+                color: 'FA8072',
+                bold: true,
+                align: 'center',
+                wrap: true
+            });
+            
+            // Add QR code image
+            const qrImage = fullscreenQr.src;
+            if (qrImage) {
+                slide.addImage({
+                    data: qrImage,
+                    x: 3, y: 2.5, w: 4, h: 4
+                });
+            }
+            
+            // Add instruction text
+            slide.addText('Scan QR code or visit the URL above', {
+                x: 0.5, y: 6.8, w: 9, h: 0.5,
+                fontSize: 18,
+                color: '999999',
+                align: 'center'
+            });
+            
+            // Save the presentation
+            await pptx.writeFile({ fileName: `qr-code-${Date.now()}.pptx` });
+            
+            downloadPptxBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Download as PPTX
+            `;
+            downloadPptxBtn.disabled = false;
+        } catch (error) {
+            console.error('Error generating PPTX:', error);
+            alert('Failed to generate PowerPoint. Please try again.');
+            downloadPptxBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Download as PPTX
+            `;
+            downloadPptxBtn.disabled = false;
+        }
     });
 
     // Event Listeners
@@ -309,7 +442,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Show full-screen QR display
     function showFullscreenDisplay(url, qrUrl) {
-        fullscreenUrl.textContent = url;
+        // Strip https:// for display
+        const displayUrl = url.replace(/^https?:\/\//, '');
+        fullscreenUrl.textContent = displayUrl;
         fullscreenQr.src = qrUrl;
         fullscreenVisit.href = url;
         fullscreenModal.classList.add('active');

@@ -680,6 +680,39 @@ button:hover {
     margin-left: 0.2rem;
 }
 
+/* Download buttons */
+.download-actions {
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--input-border);
+}
+
+.btn-download {
+    background-color: var(--secondary-text);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-download:hover {
+    background-color: var(--text-color);
+}
+
+.btn-download svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-pptx {
+    background-color: #d04423;
+}
+
+.btn-pptx:hover {
+    background-color: #b5381d;
+}
+
 @media (max-width: 600px) {
     .container {
         width: 95%;
