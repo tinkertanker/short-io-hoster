@@ -184,19 +184,42 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add background color (same as web interface - #222)
             slide.background = { color: '222222' };
             
-            // Get QR code and add full screen
+            // Add Link: label in grey
+            slide.addText('Link:', {
+                x: 0.5, y: 0.3, w: 9, h: 0.4,
+                fontSize: 24,
+                color: '888888',
+                align: 'center',
+                fontFace: 'Arial'
+            });
+            
+            // Add URL with domain in white, path in salmon
+            const domainText = fullscreenUrlDomain.textContent;
+            const pathText = fullscreenUrlPath.textContent;
+            
+            // Create text run array for two-color URL
+            const urlTextRuns = [
+                { text: domainText, options: { color: 'FFFFFF', bold: true, fontSize: 40, fontFace: 'Arial' } },
+                { text: pathText, options: { color: 'FA8072', bold: true, fontSize: 40, fontFace: 'Arial' } }
+            ];
+            
+            slide.addText(urlTextRuns, {
+                x: 0.5, y: 0.8, w: 9, h: 0.8,
+                align: 'center'
+            });
+            
+            // Get QR code and add it large below the URL
             const qrImage = fullscreenQr.src;
             if (qrImage && qrImage.startsWith('data:image')) {
                 // Extract mime type and base64 data from data URL
                 const mimeType = qrImage.split(',')[0].split(':')[1].split(';')[0];
                 const base64Data = qrImage.split(',')[1];
                 
-                // Add image full screen with some padding
-                // PptxGenJS requires data format: "image/png;base64,ABC123..."
+                // Add QR code taking up most of the slide below the URL
+                // Position: y starts after URL text, size fills remaining space
                 slide.addImage({
                     data: `${mimeType};base64,${base64Data}`,
-                    x: 0.5, y: 0.5, w: 9, h: 6.75,
-                    sizing: { type: 'contain', w: 9, h: 6.75 }
+                    x: 1, y: 1.8, w: 8, h: 5.5
                 });
             }
             
