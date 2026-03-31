@@ -84,6 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Download as Image button
     downloadImageBtn.addEventListener('click', async () => {
+        if (typeof html2canvas === 'undefined') {
+            alert('Image generation library failed to load. Please refresh the page and try again.');
+            return;
+        }
+        
         try {
             downloadImageBtn.textContent = 'Generating...';
             downloadImageBtn.disabled = true;
@@ -158,6 +163,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Download as PPTX button
     downloadPptxBtn.addEventListener('click', async () => {
+        if (typeof PptxGenJS === 'undefined') {
+            alert('PowerPoint generation library failed to load. Please refresh the page and try again.');
+            return;
+        }
+        
         try {
             downloadPptxBtn.textContent = 'Generating...';
             downloadPptxBtn.disabled = true;
@@ -211,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             // Save the presentation
-            pptx.writeFile({ fileName: `qr-code-${Date.now()}.pptx` });
+            await pptx.writeFile({ fileName: `qr-code-${Date.now()}.pptx` });
             
             downloadPptxBtn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
