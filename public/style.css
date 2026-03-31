@@ -568,49 +568,66 @@ button:hover {
 
 .fullscreen-content {
     text-align: center;
-    max-width: 90%;
-    width: 600px;
+    max-width: 95%;
+    width: 100%;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.fullscreen-url-container {
+    margin-bottom: 2rem;
+    font-size: 3rem;
+    font-weight: bold;
+    line-height: 1.3;
+}
+
+.url-label {
+    color: white;
 }
 
 .fullscreen-url {
-    font-size: 1.5rem;
     color: var(--primary-color);
-    margin-bottom: 2rem;
     word-break: break-all;
 }
 
 .fullscreen-qr-container {
     background-color: white;
-    padding: 2rem;
-    border-radius: 16px;
+    padding: 3rem;
+    border-radius: 24px;
     display: inline-block;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
 }
 
 .fullscreen-qr-container img {
-    max-width: 300px;
-    width: 100%;
+    max-width: 50vh;
+    max-height: 50vh;
+    width: auto;
     height: auto;
+    min-width: 300px;
+    min-height: 300px;
 }
 
 .fullscreen-instruction {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--secondary-text);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .fullscreen-actions {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     justify-content: center;
 }
 
 .fullscreen-actions button,
 .fullscreen-actions a {
-    padding: 0.8rem 2rem;
-    font-size: 1rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
