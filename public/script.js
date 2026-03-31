@@ -215,11 +215,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mimeType = qrImage.split(',')[0].split(':')[1].split(';')[0];
                 const base64Data = qrImage.split(',')[1];
                 
-                // Add QR code taking up most of the slide below the URL
-                // Position: y starts after URL text, size fills remaining space
+                // Add QR code centered on slide, smaller size (about 40% of previous)
+                // Slide is 10" × 7.5", so center at x: 3.4, y: 3.5 with size 3.2" × 3.2"
                 slide.addImage({
                     data: `${mimeType};base64,${base64Data}`,
-                    x: 1, y: 1.8, w: 8, h: 5.5
+                    x: 3.4, y: 3.0, w: 3.2, h: 3.2
                 });
             }
             
