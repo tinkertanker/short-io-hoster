@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevPageBtn = document.getElementById('prev-page');
     const nextPageBtn = document.getElementById('next-page');
     const pageInfo = document.getElementById('page-info');
+    const logoutButton = document.getElementById('logout-button');
     
     // State
     let currentPage = 1;
@@ -256,6 +257,15 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
     
+    // Logout button
+    logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('password');
+        passwordScreen.classList.add('active');
+        shortenerScreen.classList.remove('active');
+        passwordInput.value = '';
+        passwordError.textContent = '';
+    });
+    
     // History search
     searchButton.addEventListener('click', () => {
         currentPage = 1;
@@ -288,6 +298,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check for saved theme preference and apply it
     initializeTheme();
+    
+    // Check for saved password and auto-login
+    const savedPassword = localStorage.getItem('password');
+    if (savedPassword) {
+        // Auto-login with saved password
+        passwordScreen.classList.remove('active');
+        shortenerScreen.classList.add('active');
+        loadLinks();
+    }
 
     // Functions
     async function validatePassword() {
@@ -313,8 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Store password temporarily for subsequent requests
-                sessionStorage.setItem('password', password);
+                // Store password in localStorage for persistent login
+                localStorage.setItem('password', password);
 
                 passwordScreen.classList.remove('active');
                 shortenerScreen.classList.add('active');
@@ -337,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function shortenUrl() {
         const url = urlInput.value;
         const slug = slugInput.value;
-        const password = sessionStorage.getItem('password');
+        const password = localStorage.getItem('password');
 
         // Basic URL validation
         if (!url) {
@@ -405,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showError(`Error: ${error.message}`);
             // If authentication error, go back to password screen
             if (error.message.includes('Invalid password') || error.message.includes('Password is required')) {
-                sessionStorage.removeItem('password');
+                localStorage.removeItem('password');
                 passwordScreen.classList.add('active');
                 shortenerScreen.classList.remove('active');
             }
@@ -452,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let qrUrl = link.qrCodeURL;
         if (!qrUrl && link.idString) {
             try {
-                const response = await fetch(`/.netlify/functions/api/links/${link.idString}/qr?password=${encodeURIComponent(sessionStorage.getItem('password'))}`);
+                const response = await fetch(`/.netlify/functions/api/links/${link.idString}/qr?password=${encodeURIComponent(localStorage.getItem('password'))}`);
                 if (response.ok) {
                     const data = await response.json();
                     qrUrl = data.qrURL || data.url;
@@ -519,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Load links from API
     async function loadLinks() {
-        const password = sessionStorage.getItem('password');
+        const password = localStorage.getItem('password');
         
         if (!password) {
             return;
@@ -555,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
             linksList.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
             
             if (error.message.includes('Invalid password') || error.message.includes('Password is required')) {
-                sessionStorage.removeItem('password');
+                localStorage.removeItem('password');
                 passwordScreen.classList.add('active');
                 shortenerScreen.classList.remove('active');
             }
@@ -728,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle save
         const saveBtn = document.getElementById('edit-save');
         saveBtn.onclick = async () => {
-            const password = sessionStorage.getItem('password');
+            const password = localStorage.getItem('password');
             const originalURL = document.getElementById('edit-url').value;
             const path = document.getElementById('edit-slug').value;
             
@@ -806,7 +825,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle delete
         const deleteBtn = document.getElementById('delete-confirm');
         deleteBtn.onclick = async () => {
-            const password = sessionStorage.getItem('password');
+            const password = localStorage.getItem('password');
             
             deleteBtn.textContent = 'Deleting...';
             deleteBtn.disabled = true;
