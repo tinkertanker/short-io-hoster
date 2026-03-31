@@ -285,6 +285,28 @@ router.post('/shorten', async (req, res) => {
       }
     });
 
+    // Generate QR code for the newly created link
+    const linkId = response.data.idString || response.data.id;
+    try {
+      const qrResponse = await axios.post(`https://api.short.io/links/qr/${linkId}`, {}, {
+        headers: {
+          'Authorization': process.env.SHORT_IO_API_KEY
+        },
+        responseType: 'arraybuffer'
+      });
+      
+      // Convert binary PNG to base64 data URL
+      const base64 = Buffer.from(qrResponse.data, 'binary').toString('base64');
+      const qrCodeURL = `data:image/png;base64,${base64}`;
+      
+      // Add QR code URL to the response
+      response.data.qrCodeURL = qrCodeURL;
+    } catch (qrError) {
+      console.error('Error generating QR code:', qrError.response?.data || qrError.message);
+      // Don't fail the request if QR generation fails
+      response.data.qrCodeURL = null;
+    }
+
     res.json(response.data);
   } catch (error) {
     console.error('Error shortening URL:', error.response?.data || error.message);
@@ -294,7 +316,37 @@ router.post('/shorten', async (req, res) => {
   }
 });
 
-// Apply routes
+// Get QR code for a link
+router.get('/links/:id/qr', async (req, res) => {
+  const password = req.query.password;
+  const linkId = req.params.id;
+  
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  if (password !== SIMPLE_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid password' });
+  }
+
+  try {
+    const response = await axios.post(`https://api.short.io/links/qr/${linkId}`, {}, {
+      headers: {
+        'Authorization': process.env.SHORT_IO_API_KEY
+      },
+      responseType: 'arraybuffer'
+    });
+
+    // Convert binary PNG to base64 data URL
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    const qrCodeURL = `data:image/png;base64,${base64}`;
+
+    res.json({ qrURL: qrCodeURL });
+  } catch (error) {
+    console.error('Error generating QR code:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to generate QR code' });
+  }
+});
 app.use('/.netlify/functions/api', router);
 
 // Export handler

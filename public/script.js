@@ -14,6 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = document.getElementById('error-message');
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     
+    // QR Code elements
+    const qrContainer = document.getElementById('qr-container');
+    const qrCode = document.getElementById('qr-code');
+    const fullscreenButton = document.getElementById('fullscreen-button');
+    
+    // Full-screen modal elements
+    const fullscreenModal = document.getElementById('fullscreen-qr-modal');
+    const closeFullscreenBtn = document.getElementById('close-fullscreen');
+    const fullscreenUrl = document.getElementById('fullscreen-url');
+    const fullscreenQr = document.getElementById('fullscreen-qr');
+    const fullscreenCopy = document.getElementById('fullscreen-copy');
+    const fullscreenVisit = document.getElementById('fullscreen-visit');
+    
     // Tab elements
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -32,6 +45,39 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalPages = 1;
     let currentSearch = '';
     let allLinks = [];
+    let currentQrData = { url: '', qrUrl: '' };
+
+    // Event Listeners
+    passwordSubmit.addEventListener('click', validatePassword);
+    passwordInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') validatePassword();
+    });
+    shortenButton.addEventListener('click', shortenUrl);
+    copyButton.addEventListener('click', copyToClipboard);
+    fullscreenButton.addEventListener('click', () => {
+        showFullscreenDisplay(currentQrData.url, currentQrData.qrUrl);
+    });
+    darkModeToggle.addEventListener('click', toggleDarkMode);
+    
+    // Full-screen modal listeners
+    closeFullscreenBtn.addEventListener('click', hideFullscreenDisplay);
+    fullscreenModal.addEventListener('click', (e) => {
+        if (e.target === fullscreenModal) {
+            hideFullscreenDisplay();
+        }
+    });
+    fullscreenCopy.addEventListener('click', () => {
+        navigator.clipboard.writeText(fullscreenUrl.textContent)
+            .then(() => {
+                fullscreenCopy.textContent = 'Copied!';
+                setTimeout(() => {
+                    fullscreenCopy.textContent = 'Copy URL';
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+            });
+    });
 
     // Event Listeners
     passwordSubmit.addEventListener('click', validatePassword);
@@ -171,6 +217,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Display the result
             shortenedUrl.textContent = data.shortURL;
+            currentQrData.url = data.shortURL;
+            currentQrData.qrUrl = data.qrCodeURL;
+            
+            // Show QR code if available
+            if (data.qrCodeURL) {
+                qrCode.src = data.qrCodeURL;
+                qrContainer.classList.remove('hidden');
+            } else {
+                qrContainer.classList.add('hidden');
+            }
+            
             resultContainer.classList.remove('hidden');
 
             // Reset inputs
@@ -222,6 +279,51 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             return false;
         }
+    }
+    
+    // Show link in full-screen display (for history items)
+    async function showLinkFullscreen(link) {
+        const shortUrl = link.shortURL || link.shortUrl;
+        
+        // Try to get QR code from API if available, otherwise generate one
+        let qrUrl = link.qrCodeURL;
+        if (!qrUrl && link.idString) {
+            try {
+                const response = await fetch(`/.netlify/functions/api/links/${link.idString}/qr?password=${encodeURIComponent(sessionStorage.getItem('password'))}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    qrUrl = data.qrURL || data.url;
+                }
+            } catch (e) {
+                console.error('Failed to fetch QR code:', e);
+            }
+        }
+        
+        // If still no QR URL, generate one using a free QR code API
+        if (!qrUrl) {
+            qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(shortUrl)}`;
+        }
+        
+        showFullscreenDisplay(shortUrl, qrUrl);
+    }
+    
+    // Show full-screen QR display
+    function showFullscreenDisplay(url, qrUrl) {
+        fullscreenUrl.textContent = url;
+        fullscreenQr.src = qrUrl;
+        fullscreenVisit.href = url;
+        fullscreenModal.classList.add('active');
+        
+        // Prevent scrolling when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Hide full-screen QR display
+    function hideFullscreenDisplay() {
+        fullscreenModal.classList.remove('active');
+        
+        // Re-enable scrolling
+        document.body.style.overflow = '';
     }
     
     // Tab switching
@@ -327,8 +429,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="link-original-url" title="${originalUrl}">${truncatedUrl}</div>
                     <div class="link-clicks">👆 ${link.clicks || 0} clicks</div>
                     <div class="link-actions">
+                        <button class="btn-show" data-id="${link.idString || link.id}">Show</button>
                         <button class="btn-copy" data-url="${link.shortURL || link.shortUrl || ''}">Copy</button>
                         <button class="btn-edit" data-id="${link.idString || link.id}">Edit</button>
+                        <a href="${link.shortURL || link.shortUrl || ''}" target="_blank" class="btn-visit-mini" title="Go to link">
+                            <span class="arrow">→</span>
+                        </a>
                         <button class="btn-danger btn-delete" data-id="${link.idString || link.id}">Delete</button>
                     </div>
                 </div>
@@ -336,6 +442,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
         
         // Add event listeners to buttons
+        document.querySelectorAll('.btn-show').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const linkId = btn.dataset.id;
+                const link = allLinks.find(l => (l.idString || l.id) === linkId);
+                if (link) {
+                    showLinkFullscreen(link);
+                }
+            });
+        });
+        
         document.querySelectorAll('.btn-copy').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -373,14 +490,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // Add click handler to cards for opening the link
+        // Add click handler to cards for showing fullscreen display
         document.querySelectorAll('.link-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                if (!e.target.closest('button')) {
+                if (!e.target.closest('button') && !e.target.closest('a')) {
                     const linkId = card.dataset.id;
                     const link = allLinks.find(l => (l.idString || l.id) === linkId);
-                    if (link && (link.shortURL || link.shortUrl)) {
-                        window.open(link.shortURL || link.shortUrl, '_blank');
+                    if (link) {
+                        showLinkFullscreen(link);
                     }
                 }
             });

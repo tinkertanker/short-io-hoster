@@ -55,6 +55,11 @@
                         <p id="shortened-url"></p>
                         <button id="copy-button">Copy</button>
                     </div>
+                    <div id="qr-container" class="qr-container hidden">
+                        <img id="qr-code" src="" alt="QR Code">
+                        <p class="qr-label">Scan to visit</p>
+                    </div>
+                    <button id="fullscreen-button" class="fullscreen-btn">View Full Screen</button>
                 </div>
             </div>
             
@@ -77,6 +82,25 @@
             <p id="error-message" class="error-message"></p>
         </div>
     </div>
+    
+    <!-- Full Screen QR Display Modal -->
+    <div id="fullscreen-qr-modal" class="fullscreen-modal">
+        <button id="close-fullscreen" class="close-fullscreen-btn">&times;</button>
+        <div class="fullscreen-content">
+            <h1 id="fullscreen-url" class="fullscreen-url"></h1>
+            <div class="fullscreen-qr-container">
+                <img id="fullscreen-qr" src="" alt="QR Code">
+            </div>
+            <p class="fullscreen-instruction">Scan QR code or visit the URL above</p>
+            <div class="fullscreen-actions">
+                <button id="fullscreen-copy" class="btn-secondary">Copy URL</button>
+                <a id="fullscreen-visit" href="#" target="_blank" class="btn-visit">
+                    Visit Link <span class="arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
