@@ -1,72 +1,45 @@
 # CFF URL Shortener
 
-This is a simple URL shortener application for Code for Fun that uses the short.io API. It includes a basic password protection screen before allowing users to shorten URLs. The application features a salmon color theme.
+URL shortener with password protection, using short.io API and Netlify serverless functions.
 
 ## Features
 
-- Basic password protection
-- URL shortening using short.io API
-- Optional custom slug support
-- Copy-to-clipboard functionality
-- Responsive design
-- Salmon color theme
-- API key storage (server-side only)
-- Netlify serverless functions (no spin-down time)
+- Password protection
+- Custom slug support
+- QR code generation
+- Link history with search
+- Fullscreen QR display
+- Download as PNG or PPTX
+- Dark mode support
 
-## Local Development Setup
+## Setup
 
-1. Clone this repository
-2. Install dependencies:
-   ```
+1. **Clone & install:**
+   ```bash
+   git clone <repo>
    npm install
    ```
-3. Create a `.env` file with the following variables:
+
+2. **Create `.env`:**
    ```
    PASSWORD=your_password
-   SHORT_IO_API_KEY=your_short_io_api_key
-   SHORT_DOMAIN=your_short_domain.example.com
+   SHORT_IO_API_KEY=your_api_key
+   SHORT_DOMAIN=your_domain.com
    ```
 
-4. Run the development server:
-   ```
+3. **Run locally:**
+   ```bash
    npm run dev
    ```
 
-5. Open your browser to http://localhost:8888
-
-## Deploying to Netlify
-
-1. Make sure your GitHub repository is up to date
-2. Log in to Netlify and click "New site from Git"
-3. Connect your GitHub repository
-4. Configuration settings will be automatically applied from the netlify.toml file
-5. Add the following environment variables in the Netlify Dashboard:
-   - `PASSWORD`: Your desired password
-   - `SHORT_IO_API_KEY`: Your short.io API key
-   - `SHORT_DOMAIN`: Your short domain (e.g., "short.example.com")
-6. Click "Deploy site"
-
-### One-Click Deploy
+## Deploy
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/tinkertanker/short-io-hoster)
 
-Note: After deployment, you'll need to set up the environment variables mentioned above in your Netlify dashboard.
+After deployment, set environment variables in Netlify dashboard.
 
-## Security Notes
+## Security
 
-This implementation uses a simple approach:
-
-1. The password is stored as an environment variable
-2. The short.io API key is stored server-side and never exposed to the client
-3. Password validation happens server-side
-4. Leverages Netlify's serverless functions (which don't have spin-down time like Render's free tier)
-
-This is suitable for basic access control, but not for securing highly sensitive information.
-
-## Usage
-
-1. Open the website and enter the password
-2. Enter the URL you want to shorten
-3. (Optional) Enter a custom slug
-4. Click "Shorten URL"
-5. Copy the shortened URL using the "Copy" button
+- Password stored as environment variable
+- API key server-side only
+- Password validation server-side
