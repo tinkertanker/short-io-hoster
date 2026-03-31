@@ -603,10 +603,15 @@ button:hover {
 }
 
 .url-label {
-    color: white;
+    color: #888;
 }
 
-.fullscreen-url {
+.fullscreen-url-domain {
+    color: white;
+    word-break: break-all;
+}
+
+.fullscreen-url-path {
     color: var(--primary-color);
     word-break: break-all;
 }

@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullscreenQr = document.getElementById('fullscreen-qr');
     const fullscreenCopy = document.getElementById('fullscreen-copy');
     const fullscreenVisit = document.getElementById('fullscreen-visit');
+    const fullscreenUrlDomain = document.getElementById('fullscreen-url-domain');
+    const fullscreenUrlPath = document.getElementById('fullscreen-url-path');
     const downloadContent = document.getElementById('download-content');
     const downloadImageBtn = document.getElementById('download-image');
     const downloadPptxBtn = document.getElementById('download-pptx');
@@ -71,7 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     fullscreenCopy.addEventListener('click', () => {
-        navigator.clipboard.writeText(fullscreenUrl.textContent)
+        const fullUrl = fullscreenUrlDomain.textContent + fullscreenUrlPath.textContent;
+        navigator.clipboard.writeText(fullUrl)
             .then(() => {
                 fullscreenCopy.textContent = 'Copied!';
                 setTimeout(() => {
@@ -175,9 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Create a new presentation
             const pptx = new PptxGenJS();
-            
-            // Set layout to 16:9
-            pptx.layout = 'LAYOUT_16x9';
             
             const slide = pptx.addSlide();
             
@@ -470,7 +470,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function showFullscreenDisplay(url, qrUrl) {
         // Strip https:// for display
         const displayUrl = url.replace(/^https?:\/\//, '');
-        fullscreenUrl.textContent = displayUrl;
+        
+        // Split URL into domain and path
+        const firstSlashIndex = displayUrl.indexOf('/');
+        if (firstSlashIndex !== -1) {
+            fullscreenUrlDomain.textContent = displayUrl.substring(0, firstSlashIndex);
+            fullscreenUrlPath.textContent = displayUrl.substring(firstSlashIndex);
+        } else {
+            fullscreenUrlDomain.textContent = displayUrl;
+            fullscreenUrlPath.textContent = '';
+        }
+        
         fullscreenQr.src = qrUrl;
         fullscreenVisit.href = url;
         fullscreenModal.classList.add('active');
