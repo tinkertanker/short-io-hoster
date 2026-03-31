@@ -23,7 +23,7 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
     </button>
-    <div class="container">
+    <div class="container" id="main-container">
         <div id="password-screen" class="screen active">
             <h1>CFF URL Shortener</h1>
             <div class="form-group">
@@ -34,22 +34,46 @@
         </div>
 
         <div id="shortener-screen" class="screen">
-            <h1>CFF URL Shortener</h1>
-            <div class="form-group">
-                <input type="url" id="url-input" placeholder="Enter URL to shorten" required>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="create">Create Link</button>
+                <button class="tab-btn" data-tab="history">History</button>
             </div>
-            <div class="form-group">
-                <input type="text" id="slug-input" placeholder="Custom slug (optional)">
-            </div>
-            <button id="shorten-button">Shorten URL</button>
             
-            <div id="result-container" class="hidden">
-                <h2>Your shortened URL:</h2>
-                <div class="result-box">
-                    <p id="shortened-url"></p>
-                    <button id="copy-button">Copy</button>
+            <div id="create-tab" class="tab-content active">
+                <h1>CFF URL Shortener</h1>
+                <div class="form-group">
+                    <input type="url" id="url-input" placeholder="Enter URL to shorten" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="slug-input" placeholder="Custom slug (optional)">
+                </div>
+                <button id="shorten-button">Shorten URL</button>
+                
+                <div id="result-container" class="hidden">
+                    <h2>Your shortened URL:</h2>
+                    <div class="result-box">
+                        <p id="shortened-url"></p>
+                        <button id="copy-button">Copy</button>
+                    </div>
                 </div>
             </div>
+            
+            <div id="history-tab" class="tab-content">
+                <h1>Link History</h1>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search links...">
+                    <button id="search-button">Search</button>
+                </div>
+                <div id="links-list" class="links-list">
+                    <div class="loading">Loading links...</div>
+                </div>
+                <div id="pagination" class="pagination hidden">
+                    <button id="prev-page" class="pagination-btn">&larr; Previous</button>
+                    <span id="page-info" class="page-info">Page 1 of 1</span>
+                    <button id="next-page" class="pagination-btn">Next &rarr;</button>
+                </div>
+            </div>
+            
             <p id="error-message" class="error-message"></p>
         </div>
     </div>

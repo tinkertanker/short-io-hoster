@@ -20,6 +20,37 @@ app.use(bodyParser.json());
 app.use(bodyParser.text({ type: 'application/json' }));
 app.use(express.json());
 
+// Helper function to extract password from request
+function extractPassword(req) {
+  let password;
+  if (Buffer.isBuffer(req.body)) {
+    try {
+      const bodyJson = JSON.parse(req.body.toString());
+      password = bodyJson.password;
+    } catch (e) {
+      console.log('Error parsing Buffer body:', e.message);
+    }
+  } else {
+    password = req.body?.password || req.query?.password;
+  }
+  return password;
+}
+
+// Helper function to validate password
+function validatePasswordMiddleware(req, res, next) {
+  const password = extractPassword(req);
+  
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  if (password !== SIMPLE_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid password' });
+  }
+
+  next();
+}
+
 // Routes
 router.post('/authenticate', (req, res) => {
   console.log('Authentication request received:', req.body);
@@ -55,6 +86,147 @@ router.post('/authenticate', (req, res) => {
 
   console.log('Authentication successful');
   res.json({ success: true });
+});
+
+// Get list of shortened links
+router.get('/links', async (req, res) => {
+  console.log('Get links request received:', req.query);
+  
+  const password = req.query.password;
+  
+  if (!password) {
+    console.log('No password provided in get links request');
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  if (password !== SIMPLE_PASSWORD) {
+    console.log('Password mismatch in get links request. Received:', password);
+    return res.status(401).json({ error: 'Invalid password' });
+  }
+
+  try {
+    const { page = 1, limit = 50, search = '' } = req.query;
+    
+    // First, get domain details to get the domain_id
+    const domainsResponse = await axios.get('https://api.short.io/api/domains', {
+      headers: {
+        'Authorization': process.env.SHORT_IO_API_KEY,
+        'Accept': 'application/json'
+      }
+    });
+    
+    // Find the domain that matches our SHORT_DOMAIN
+    const domains = domainsResponse.data || [];
+    const domain = domains.find(d => d.hostname === process.env.SHORT_DOMAIN || d.hostname.includes(process.env.SHORT_DOMAIN));
+    
+    if (!domain) {
+      console.error('Domain not found:', process.env.SHORT_DOMAIN);
+      return res.status(404).json({ error: 'Domain not found' });
+    }
+    
+    const domainId = domain.id;
+    
+    // Build query parameters for short.io API
+    const params = new URLSearchParams();
+    params.append('domain_id', domainId);
+    params.append('limit', limit);
+    params.append('offset', (page - 1) * limit);
+    
+    if (search) {
+      params.append('search', search);
+    }
+
+    const response = await axios.get(`https://api.short.io/api/links?${params.toString()}`, {
+      headers: {
+        'Authorization': process.env.SHORT_IO_API_KEY,
+        'Accept': 'application/json'
+      }
+    });
+
+    res.json({
+      links: response.data.links || [],
+      total: response.data.total || 0,
+      page: parseInt(page),
+      limit: parseInt(limit)
+    });
+  } catch (error) {
+    console.error('Error fetching links:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch links' });
+  }
+});
+
+// Delete a link
+router.delete('/links/:id', async (req, res) => {
+  const password = req.query.password;
+  const linkId = req.params.id;
+  
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  if (password !== SIMPLE_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid password' });
+  }
+
+  try {
+    await axios.delete(`https://api.short.io/links/${linkId}`, {
+      headers: {
+        'Authorization': process.env.SHORT_IO_API_KEY,
+        'Accept': 'application/json'
+      }
+    });
+
+    res.json({ success: true, message: 'Link deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting link:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to delete link' });
+  }
+});
+
+// Update a link
+router.put('/links/:id', async (req, res) => {
+  const linkId = req.params.id;
+  let password, originalURL, path;
+  
+  if (Buffer.isBuffer(req.body)) {
+    try {
+      const bodyJson = JSON.parse(req.body.toString());
+      password = bodyJson.password;
+      originalURL = bodyJson.originalURL;
+      path = bodyJson.path;
+    } catch (e) {
+      console.log('Error parsing Buffer body:', e.message);
+    }
+  } else {
+    password = req.body?.password;
+    originalURL = req.body?.originalURL;
+    path = req.body?.path;
+  }
+  
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  if (password !== SIMPLE_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid password' });
+  }
+
+  try {
+    const response = await axios.post(`https://api.short.io/links/${linkId}`, {
+      originalURL,
+      path
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': process.env.SHORT_IO_API_KEY
+      }
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error updating link:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to update link' });
+  }
 });
 
 router.post('/shorten', async (req, res) => {
