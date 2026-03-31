@@ -27,8 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextPageBtn = document.getElementById('next-page');
     const pageInfo = document.getElementById('page-info');
     
-    const container = document.getElementById('main-container');
-    
     // State
     let currentPage = 1;
     let totalPages = 1;
@@ -245,13 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 content.classList.remove('active');
             }
         });
-        
-        // Toggle wide container for history tab
-        if (tabName === 'history') {
-            container.classList.add('wide');
-        } else {
-            container.classList.remove('wide');
-        }
         
         // Load links when switching to history tab
         if (tabName === 'history') {
