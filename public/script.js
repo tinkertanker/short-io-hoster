@@ -176,50 +176,27 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create a new presentation
             const pptx = new PptxGenJS();
             
+            // Set layout to 16:9
+            pptx.layout = 'LAYOUT_16x9';
+            
             const slide = pptx.addSlide();
             
-            // Add background color
+            // Add background color (same as web interface - #222)
             slide.background = { color: '222222' };
             
-            // Add "Link:" label in white
-            slide.addText('Link:', {
-                x: 0.5, y: 0.5, w: 9, h: 0.5,
-                fontSize: 28,
-                color: 'FFFFFF',
-                align: 'center'
-            });
-            
-            // Add URL in salmon color
-            const displayUrl = fullscreenUrl.textContent;
-            slide.addText(displayUrl, {
-                x: 0.5, y: 1.2, w: 9, h: 1,
-                fontSize: 40,
-                color: 'FA8072',
-                bold: true,
-                align: 'center',
-                wrap: true
-            });
-            
-            // Get QR code and convert to proper format for PptxGenJS
+            // Get QR code and add full screen
             const qrImage = fullscreenQr.src;
             if (qrImage && qrImage.startsWith('data:image')) {
                 // Extract base64 data from data URL
                 const base64Data = qrImage.split(',')[1];
                 
+                // Add image full screen with some padding
                 slide.addImage({
                     data: base64Data,
-                    x: 2.5, y: 2.8, w: 5, h: 5,
-                    sizing: { type: 'contain', w: 5, h: 5 }
+                    x: 0.5, y: 0.5, w: 9, h: 6.75,
+                    sizing: { type: 'contain', w: 9, h: 6.75 }
                 });
             }
-            
-            // Add instruction text
-            slide.addText('Scan QR code or visit the URL above', {
-                x: 0.5, y: 7.5, w: 9, h: 0.5,
-                fontSize: 20,
-                color: '999999',
-                align: 'center'
-            });
             
             // Save the presentation
             await pptx.writeFile({ fileName: `qr-code-${Date.now()}.pptx` });
