@@ -605,7 +605,7 @@ button:hover {
 }
 
 .url-label {
-    color: var(--fullscreen-url-color);
+    color: #888;
 }
 
 .fullscreen-url-domain {
@@ -614,7 +614,7 @@ button:hover {
 }
 
 .fullscreen-url-path {
-    color: var(--fullscreen-url-color);
+    color: var(--primary-color);
     word-break: break-all;
 }
 
